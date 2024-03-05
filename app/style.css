@@ -70,7 +70,8 @@ backdrop-filter: blur(5.9px);
 
 #img-container{
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
+    
 }
 
 .desc{
@@ -97,6 +98,13 @@ backdrop-filter: blur(5.9px);
 
     #searchInput{
         font-size: .8rem ;
+    }
+
+    #img-container{
+        display: flex;
+        justify-content: center;
+        margin: 2rem;
+        
     }
     
     

@@ -2,7 +2,7 @@
 let artworks = [];
 let maxLength = 4; // Corrected variable name
 let shortUrl = 'https://api.artic.edu/api/v1/artworks?fields=image_id,title,artist_display,place_of_origin,thumbnail.alt_text,short_description,date_display,id,category_titles,&page=1&limit=30'
-
+let searchUrl = 'https://api.artic.edu/api/v1/artworks?ids=&fields=image_id,title,artist_display,place_of_origin,thumbnail.alt_text,short_description,date_display,id,category_titles,&page=1&limit=30'
 
 
 class Artwork {
@@ -19,15 +19,33 @@ class Artwork {
         this.categoryTitle = categoryTitle
     }
 }
+async function getDatasearch() {
+    document.getElementById('searchForm').addEventListener('submit', async function (event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        var searchTerm = document.getElementById('searchInput').value;
+
+        let queryURL = `https://api.artic.edu/api/v1/artworks/search?q=${searchTerm}&fields=image_id,title,artist_display,place_of_origin,thumbnail.alt_text,short_description,date_display,id,category_titles, &page=1&limit=30`;
+
+        getData(queryURL)
+    });
+}
+
+
 
 async function getData(urll) {
     let response = await fetch(urll);
     let data = await response.json();
 
+    artworks = [];
+
+
     data.data.forEach(artworkData => {
         const artistName = artworkData.artist_display.split('\n')[0].replace(/\s*\(.*?\)\s*/, '').trim();
         let cleanDate = artworkData.date_display.replace(/[^0-9]/gi, '');
         let cleanerDate = cleanDate.slice(0, maxLength); // Corrected variable name
+        const cleanCat = artworkData.category_titles.slice(',')[0]
+        let cleanedText = artworkData.short_description;
 
 
         let artwork = new Artwork(
@@ -37,10 +55,10 @@ async function getData(urll) {
             artistName,
             artworkData.place_of_origin,
             artworkData.alt_text,
-            artworkData.short_description,
+            cleanedText,
             cleanerDate, // Updated to use cleanerDate
             artworkData.id,
-            artworkData.category_titles,
+            cleanCat,
         );
 
         artworks.push(artwork);
@@ -52,6 +70,9 @@ async function getData(urll) {
 
 function htmlBuild() {
     const container = document.getElementById('img-container');
+
+    container.innerHTML = '';
+
     artworks.forEach(artwork => {
         const divArt = document.createElement('div');
         divArt.classList.add('artwork', 'px-5', 'mx-4', 'my-2', 'py-2', 'col-md-4', 'col-lg-3', 'col-12', 'img-fluid',);
@@ -112,3 +133,4 @@ function htmlBuild() {
 
 
 getData(shortUrl)
+getDatasearch()
